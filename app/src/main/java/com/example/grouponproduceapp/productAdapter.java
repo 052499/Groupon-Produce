@@ -13,13 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
+public class productAdapter extends RecyclerView.Adapter<productAdapter.ProductViewHolder> {
+    private List<product> productList;
+    private Context context;
 
-    private final List<Product> productList;
-    private final Context context;
-
-    // Constructor to initialize context and product list
-    public ProductAdapter(Context context, List<Product> productList) {
+    // Constructor to initialize context and productList
+    public productAdapter(Context context, List<product> productList) {
         this.context = context;
         this.productList = productList;
     }
@@ -27,20 +26,31 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate layout for individual product item
         View view = LayoutInflater.from(context).inflate(R.layout.item_product, parent, false);
         return new ProductViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        Product product = productList.get(position);
+        product product = productList.get(position);
+        holder.productName.setText(product.getName());
+        holder.productPrice.setText(product.getPrice());
+        holder.productImage.setImageResource(product.getImageResId());
 
-        // Bind product details to the UI
-        holder.bind(product);
-
-        // Set item click listener to navigate to ProductDetailActivity
-        holder.itemView.setOnClickListener(v -> navigateToProductDetail(product));
+        // Set click listener for each item if needed
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ProductDetailActivity.class);
+                intent.putExtra("productName", product.getName());
+                intent.putExtra("productPrice", product.getPrice());
+                intent.putExtra("farmName", product.getFarmName());
+                intent.putExtra("quantity", product.getQuantity());
+                intent.putExtra("expiryDate", product.getExpiryDate());
+                intent.putExtra("imageResId", product.getImageResId());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -48,12 +58,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         return productList.size();
     }
 
-    // ViewHolder class to handle individual item views
-    static class ProductViewHolder extends RecyclerView.ViewHolder {
-
-        private final ImageView productImage;
-        private final TextView productName;
-        private final TextView productPrice;
+    public static class ProductViewHolder extends RecyclerView.ViewHolder {
+        ImageView productImage;
+        TextView productName, productPrice;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -61,24 +68,5 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             productName = itemView.findViewById(R.id.product_name);
             productPrice = itemView.findViewById(R.id.product_price);
         }
-
-        // Method to bind product data to the views
-        public void bind(Product product) {
-            productName.setText(product.getName());
-            productPrice.setText(product.getPrice());
-            productImage.setImageResource(product.getImageResId());
-        }
-    }
-
-    // Helper method to navigate to the ProductDetailActivity
-    private void navigateToProductDetail(Product product) {
-        Intent intent = new Intent(context, ProductDetailActivity.class);
-        intent.putExtra("productName", product.getName());
-        intent.putExtra("productPrice", product.getPrice());
-        intent.putExtra("farmName", product.getFarmName());
-        intent.putExtra("quantity", product.getQuantity());
-        intent.putExtra("expiryDate", product.getExpiryDate());
-        intent.putExtra("imageResId", product.getImageResId());
-        context.startActivity(intent);
     }
 }
