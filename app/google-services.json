@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "679301665751",
+    "project_id": "grouponproduce",
+    "storage_bucket": "grouponproduce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679301665751:android:a8ffd8a28440c20e06f192",
+        "android_client_info": {
+          "package_name": "com.example.grouponproduceapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYLXRFHI4tbGm2HStEiAoov39ckaYZtHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

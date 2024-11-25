@@ -2,58 +2,107 @@ package com.example.grouponproduceapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.grouponproduceapp.R;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LOGIN_PAGE extends AppCompatActivity {
 
+    private static final String TAG = "LOGIN_PAGE";
+
     private EditText emailEditText, passwordEditText;
-    private Button loginButton;
-    private TextView registerRedirect;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
 
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
         emailEditText = findViewById(R.id.email);
         passwordEditText = findViewById(R.id.password);
-        loginButton = findViewById(R.id.login_button);
-        registerRedirect = findViewById(R.id.register_redirect);
+        Button loginButton = findViewById(R.id.login_button);
+        TextView registerRedirect = findViewById(R.id.register_redirect);
+        TextView forgotPassword = findViewById(R.id.forgot_password);
 
-        loginButton.setOnClickListener(v -> {
-            String email = emailEditText.getText().toString().trim();
-            String password = passwordEditText.getText().toString().trim();
+        // Handle login button click
+        loginButton.setOnClickListener(v -> handleLogin());
 
-            // Check if the email and password are correct (fetch stored credentials)
-            if (isValidUser(email, password)) {
-                Intent intent = new Intent(LOGIN_PAGE.this, Product_search.class); // Navigate to next activity
-                startActivity(intent);
-                finish(); // Close login page
-            } else {
-                Toast.makeText(LOGIN_PAGE.this, "Invalid credentials, please try again", Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        // Redirect to registration page
         registerRedirect.setOnClickListener(v -> {
-            // Redirect to registration page
             Intent intent = new Intent(LOGIN_PAGE.this, Registration_page.class);
             startActivity(intent);
         });
+
+        // Handle forgot password click
+        forgotPassword.setOnClickListener(v -> handleForgotPassword());
     }
 
-    private boolean isValidUser(String email, String password) {
-        // Fetch stored credentials from SharedPreferences
-        String storedEmail = getSharedPreferences("user_details", MODE_PRIVATE).getString("email", null);
-        String storedPassword = getSharedPreferences("user_details", MODE_PRIVATE).getString("password", null);
+    /**
+     * Handles user login
+     */
+    private void handleLogin() {
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
 
-        // Check if the entered credentials match the stored ones
-        return storedEmail != null && storedPassword != null &&
-                storedEmail.equals(email) && storedPassword.equals(password);
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null && user.isEmailVerified()) {
+                            // Navigate to the next activity
+                            Intent intent = new Intent(LOGIN_PAGE.this, Product_search.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Please verify your email address", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Log.e(TAG, "Login failed", task.getException());
+                        Toast.makeText(this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * Handles the forgot password functionality
+     */
+    private void handleForgotPassword() {
+        String email = emailEditText.getText().toString().trim();
+
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "Please enter your email to reset your password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Password reset email sent! Check your inbox.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e(TAG, "Password reset failed", task.getException());
+                        Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

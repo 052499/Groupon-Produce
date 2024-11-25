@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="app_name_color">#FFFFFFFF</color> <!-- Custom Purple Color -->
     <color name="purple_500">#6200EE</color> <!-- Purple color for button background -->
+    <color name="link_color">#FF6200EE</color> <!-- Replace with desired color -->
+
 </resources>
