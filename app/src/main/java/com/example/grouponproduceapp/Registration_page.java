@@ -48,10 +48,26 @@ public class Registration_page extends AppCompatActivity {
                 Toast.makeText(Registration_page.this, "Please confirm your password", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Password length check (min 6 characters)
             if (password.length() < 6) {
                 Toast.makeText(Registration_page.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Check for at least one uppercase letter
+            if (!password.matches(".*[A-Z].*")) {
+                Toast.makeText(Registration_page.this, "Password must contain at least one uppercase letter", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Check for at least one special character
+            if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
+                Toast.makeText(Registration_page.this, "Password must contain at least one special character", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Check if passwords match
             if (!password.equals(confirmPassword)) {
                 Toast.makeText(Registration_page.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 return;

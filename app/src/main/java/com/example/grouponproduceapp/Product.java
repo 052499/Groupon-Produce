@@ -8,7 +8,7 @@ public class product {
     private String quantity;
     private String expiryDate;
 
-    
+    // Constructor
     public product(String name, String price, int imageResId, String farmName, String quantity, String expiryDate) {
         this.name = name;
         this.price = price;
@@ -18,7 +18,7 @@ public class product {
         this.expiryDate = expiryDate;
     }
 
-    
+    // Getters
     public String getName() { return name; }
     public String getPrice() { return price; }
     public int getImageResId() { return imageResId; }
@@ -26,7 +26,7 @@ public class product {
     public String getQuantity() { return quantity; }
     public String getExpiryDate() { return expiryDate; }
 
-    
+    // Optional: ToString method to help with debugging
     @Override
     public String toString() {
         return "Product{" +

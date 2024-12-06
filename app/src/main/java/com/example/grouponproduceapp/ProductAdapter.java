@@ -17,7 +17,7 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ProductV
     private List<product> productList;
     private Context context;
 
-    
+    // Constructor to initialize context and productList
     public productAdapter(Context context, List<product> productList) {
         this.context = context;
         this.productList = productList;
@@ -37,7 +37,7 @@ public class productAdapter extends RecyclerView.Adapter<productAdapter.ProductV
         holder.productPrice.setText(product.getPrice());
         holder.productImage.setImageResource(product.getImageResId());
 
-        
+        // Set click listener for each item if needed
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
