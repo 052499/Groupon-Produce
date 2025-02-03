@@ -88,21 +88,24 @@ public class LOGIN_PAGE extends AppCompatActivity {
      * Handles the forgot password functionality
      */
     private void handleForgotPassword() {
-        String email = emailEditText.getText().toString().trim();
+    String email = emailEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please enter your email to reset your password", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        mAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Password reset email sent! Check your inbox.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.e(TAG, "Password reset failed", task.getException());
-                        Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+    if (email.isEmpty()) {
+        showToast("Please enter your email to reset your password");
+        return;
     }
+
+    mAuth.sendPasswordResetEmail(email)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    showToast("Password reset email sent! Check your inbox.");
+                } else {
+                    Log.e(TAG, "Password reset failed", task.getException());
+                    showToast("Error: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                }
+            });
+}
+
+private void showToast(String message) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 }
