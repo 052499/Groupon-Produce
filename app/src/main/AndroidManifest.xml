@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -15,33 +14,39 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GroupOnProduceApp"
         tools:targetApi="31">
-
-        <!-- Product Detail Activity -->
         <activity
-            android:name=".ProductDetailActivity"
+            android:name=".CartAdapter"
             android:exported="false" />
-
-        <!-- Product Search Activity -->
         <activity
             android:name=".Product_search"
             android:exported="false" />
-
-        <!-- Registration Page -->
+        <activity
+            android:name=".ProductAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".Product"
+            android:exported="false" />
+        <activity
+            android:name=".ProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" /> <!-- Registration Page -->
         <activity
             android:name=".Registration_page"
-            android:exported="false" />
-
-        <!-- Login Page -->
+            android:exported="false" /> <!-- Login Page -->
         <activity
             android:name=".LOGIN_PAGE"
-            android:exported="false" />
-
-        <!-- Main Activity -->
+            android:exported="false" /> <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

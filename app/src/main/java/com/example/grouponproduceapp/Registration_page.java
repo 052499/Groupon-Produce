@@ -7,13 +7,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
-public class RegistrationPage extends AppCompatActivity {
+public class Registration_page extends AppCompatActivity {
 
     private EditText emailEditText, passwordEditText, confirmPasswordEditText;
     private Button registerButton;
@@ -24,81 +22,77 @@ public class RegistrationPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_page);
 
-        initializeUI();
+        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        registerButton.setOnClickListener(v -> registerUser());
-    }
-
-    private void initializeUI() {
         emailEditText = findViewById(R.id.email);
         passwordEditText = findViewById(R.id.password);
         confirmPasswordEditText = findViewById(R.id.confirm_password);
         registerButton = findViewById(R.id.register_button);
-    }
 
-    private void registerUser() {
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
-        String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+        registerButton.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
 
-        if (!validateInput(email, password, confirmPassword)) return;
+            // Validate input
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(Registration_page.this, "Please enter your email", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(Registration_page.this, "Please enter your password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (TextUtils.isEmpty(confirmPassword)) {
+                Toast.makeText(Registration_page.this, "Please confirm your password", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        sendEmailVerification();
-                    } else {
-                        Toast.makeText(this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
+            // Password length check (min 6 characters)
+            if (password.length() < 6) {
+                Toast.makeText(Registration_page.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-    private boolean validateInput(String email, String password, String confirmPassword) {
-        if (TextUtils.isEmpty(email)) {
-            showToast("Please enter your email");
-            return false;
-        }
-        if (TextUtils.isEmpty(password)) {
-            showToast("Please enter your password");
-            return false;
-        }
-        if (TextUtils.isEmpty(confirmPassword)) {
-            showToast("Please confirm your password");
-            return false;
-        }
-        if (password.length() < 6) {
-            showToast("Password must be at least 6 characters");
-            return false;
-        }
-        if (!password.equals(confirmPassword)) {
-            showToast("Passwords do not match");
-            return false;
-        }
-        return true;
-    }
+            // Check for at least one uppercase letter
+            if (!password.matches(".*[A-Z].*")) {
+                Toast.makeText(Registration_page.this, "Password must contain at least one uppercase letter", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-    private void sendEmailVerification() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            user.sendEmailVerification()
+            // Check for at least one special character
+            if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
+                Toast.makeText(Registration_page.this, "Password must contain at least one special character", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Check if passwords match
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(Registration_page.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Register user with Firebase
+            mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            showToast("Registration successful. Please check your email for verification.");
-                            navigateToLogin();
+                            // Send email verification
+                            mAuth.getCurrentUser().sendEmailVerification()
+                                    .addOnCompleteListener(verificationTask -> {
+                                        if (verificationTask.isSuccessful()) {
+                                            Toast.makeText(Registration_page.this, "Registration successful. Please check your email for verification.", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(Registration_page.this, LOGIN_PAGE.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Toast.makeText(Registration_page.this, "Failed to send verification email.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                         } else {
-                            showToast("Failed to send verification email.");
+                            Toast.makeText(Registration_page.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-        }
-    }
-
-    private void navigateToLogin() {
-        startActivity(new Intent(RegistrationPage.this, LoginPage.class));
-        finish();
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.example.grouponproduceapp;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,7 +10,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,7 +45,7 @@ public class LOGIN_PAGE extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Handle forgot password click
+        // Redirect to forgot password page
         forgotPassword.setOnClickListener(v -> handleForgotPassword());
     }
 
@@ -85,27 +85,10 @@ public class LOGIN_PAGE extends AppCompatActivity {
     }
 
     /**
-     * Handles the forgot password functionality
+     * Redirects to Forgot Password activity
      */
     private void handleForgotPassword() {
-    String email = emailEditText.getText().toString().trim();
-
-    if (email.isEmpty()) {
-        showToast("Please enter your email to reset your password");
-        return;
+        Intent intent = new Intent(LOGIN_PAGE.this, ForgotPasswordActivity.class);
+        startActivity(intent);
     }
-
-    mAuth.sendPasswordResetEmail(email)
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    showToast("Password reset email sent! Check your inbox.");
-                } else {
-                    Log.e(TAG, "Password reset failed", task.getException());
-                    showToast("Error: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
-                }
-            });
-}
-
-private void showToast(String message) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 }
