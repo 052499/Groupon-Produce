@@ -1,7 +1,10 @@
-Project Vision & Objective 
+Project Vision & Objective:-
+
 Groupon Produce is a web and mobile-based marketplace connecting local farmers with consumers, providing fresh and organic produce at competitive prices. By eliminating intermediaries, it ensures fair pricing for farmers while offering customers affordable, high-quality organic food. The platform promotes sustainable farming practices and enhances access to healthy food choices.
 
-Groupon Produce – Key Functionalities
+
+Groupon Produce – Key Functionalities:-
+
 User Management 🚀
 Secure registration & login.
 Role-based access: Consumers, Farmers, Admins.
