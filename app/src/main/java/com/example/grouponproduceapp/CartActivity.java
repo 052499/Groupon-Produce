@@ -1,61 +1,42 @@
 package com.example.grouponproduceapp;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
+import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
-import java.util.List;
 
 public class CartActivity extends AppCompatActivity {
-
-    private RecyclerView cartRecyclerView;
+    private RecyclerView recyclerView;
     private CartAdapter cartAdapter;
-    private List<Product> cartList;
-    private DatabaseReference cartRef;
-    private FirebaseAuth auth;
+    private ArrayList<Product> cartItems;
+    private Button checkoutButton, clearCartButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+        setContentView(R.layout.cart_layout);
 
-        cartRecyclerView = findViewById(R.id.cart_recycler_view);
-        cartRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        cartList = new ArrayList<>();
-        cartAdapter = new CartAdapter(this, cartList);
-        cartRecyclerView.setAdapter(cartAdapter);
+        recyclerView = findViewById(R.id.cart_recycler_view);
+        checkoutButton = findViewById(R.id.checkout_button);
+        clearCartButton = findViewById(R.id.clear_cart_button); // Button to clear cart
 
-        auth = FirebaseAuth.getInstance();
-        cartRef = FirebaseDatabase.getInstance().getReference("cart").child(auth.getCurrentUser().getUid());
+        cartItems = new ArrayList<>(CartManager.getInstance().getCartItems()); // Copy to prevent modification issues
 
-        loadCartItems();
-    }
+        cartAdapter = new CartAdapter(this, cartItems);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(cartAdapter);
 
-    private void loadCartItems() {
-        cartRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                cartList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Product product = dataSnapshot.getValue(Product.class);
-                    cartList.add(product);
-                }
-                cartAdapter.notifyDataSetChanged();
-            }
+        checkoutButton.setOnClickListener(v -> {
+            startActivity(new Intent(CartActivity.this, PaymentActivity.class));
+        });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(CartActivity.this, "Failed to load cart items!", Toast.LENGTH_SHORT).show();
-            }
+        clearCartButton.setOnClickListener(v -> {
+            CartManager.getInstance().clearCart();
+            cartItems.clear();
+            cartAdapter.notifyDataSetChanged();
         });
     }
 }
