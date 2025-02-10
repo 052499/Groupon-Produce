@@ -75,24 +75,30 @@ public class Registration_page extends AppCompatActivity {
 
             // Register user with Firebase
             mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            // Send email verification
-                            mAuth.getCurrentUser().sendEmailVerification()
-                                    .addOnCompleteListener(verificationTask -> {
-                                        if (verificationTask.isSuccessful()) {
-                                            Toast.makeText(Registration_page.this, "Registration successful. Please check your email for verification.", Toast.LENGTH_SHORT).show();
-                                            Intent intent = new Intent(Registration_page.this, LOGIN_PAGE.class);
-                                            startActivity(intent);
-                                            finish();
-                                        } else {
-                                            Toast.makeText(Registration_page.this, "Failed to send verification email.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(Registration_page.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        });
-    }
-}
+    .addOnCompleteListener(task -> {
+        if (!task.isSuccessful()) {
+            Toast.makeText(Registration_page.this, 
+                "Registration failed: " + task.getException().getMessage(), 
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Send email verification
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            user.sendEmailVerification()
+                .addOnCompleteListener(verificationTask -> {
+                    if (verificationTask.isSuccessful()) {
+                        Toast.makeText(Registration_page.this, 
+                            "Registration successful. Please check your email for verification.", 
+                            Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(Registration_page.this, LOGIN_PAGE.class));
+                        finish();
+                    } else {
+                        Toast.makeText(Registration_page.this, 
+                            "Failed to send verification email.", 
+                            Toast.LENGTH_SHORT).show();
+                    }
+                });
+        }
+    });
