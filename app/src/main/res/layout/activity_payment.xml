@@ -1,6 +1,26 @@
-RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="16dp">
-<!--  Payment Message  -->
-<TextView android:id="@+id/payment_message" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Proceed with your payment" android:textSize="18sp" android:layout_centerHorizontal="true" android:layout_marginTop="30dp"/>
-<!--  Pay Now Button  -->
-<Button android:id="@+id/pay_button" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Pay Now" android:layout_below="@id/payment_message" android:layout_marginTop="50dp"/>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Payment Message -->
+    <TextView
+        android:id="@+id/payment_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Proceed with your payment"
+        android:textSize="18sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <!-- Pay Now Button -->
+    <Button
+        android:id="@+id/pay_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pay Now"
+        android:layout_below="@+id/payment_message"
+        android:layout_marginTop="50dp" />
+
 </RelativeLayout>
