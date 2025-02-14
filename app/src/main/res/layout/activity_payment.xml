@@ -1,8 +1,10 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
 
     <!-- Payment Message -->
     <TextView
@@ -11,7 +13,6 @@
         android:layout_height="wrap_content"
         android:text="Proceed with your payment"
         android:textSize="18sp"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp" />
 
     <!-- Pay Now Button -->
@@ -20,7 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Pay Now"
-        android:layout_below="@+id/payment_message"
         android:layout_marginTop="50dp" />
 
-</RelativeLayout>
+</LinearLayout>
