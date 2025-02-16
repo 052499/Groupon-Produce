@@ -9,30 +9,34 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class PaymentActivity extends AppCompatActivity {
 
-        private Button payButton;
+    private Button payButton;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                setContentView(R.layout.activity_payment);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_payment);
 
-                // Initialize the pay button
-                payButton = findViewById(R.id.pay_button);
+        initializeUI();
+    }
 
-                // Set an onClick listener to simulate the payment process
-                payButton.setOnClickListener(v -> {
-                        // Simulate a successful payment
-                        simulatePayment();
-                });
-        }
+    private void initializeUI() {
+        payButton = findViewById(R.id.pay_button);
+        payButton.setOnClickListener(v -> processPayment());
+    }
 
-        // Simulate the payment process
-        private void simulatePayment() {
-                // Display a success message
-                Toast.makeText(PaymentActivity.this, "Payment Successful!", Toast.LENGTH_SHORT).show();
+    private void processPayment() {
+        showToast("Payment Successful!");
+        navigateToSuccessScreen();
+    }
 
-                // Redirect to SuccessActivity after the payment
-                startActivity(new Intent(PaymentActivity.this, SuccessActivity.class));
-                finish();  // Optionally finish this activity if you want to remove it from the stack
-        }
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void navigateToSuccessScreen() {
+        Intent intent = new Intent(this, SuccessActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
+
