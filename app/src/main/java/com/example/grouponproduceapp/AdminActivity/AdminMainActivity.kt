@@ -1,4 +1,4 @@
-package com.app.growceries.activity
+package com.example.grouponproduceapp;
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -7,8 +7,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
-import com.app.growceries.R
-import com.app.growceries.databinding.ActivityAdminMainBinding
+import com.example.grouponproduceapp.R
+import com.example.grouponproduceapp.databinding.ActivityAdminMainBinding
 
 class AdminMainActivity : AppCompatActivity() {
 
