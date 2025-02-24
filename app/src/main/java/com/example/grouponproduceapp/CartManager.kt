@@ -1,8 +1,8 @@
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.app.growceries.models.CartItem
-import com.app.growceries.models.Product
+import com.example.grouponproduceapp.models.CartItem
+import com.example.grouponproduceapp.models.Product
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
