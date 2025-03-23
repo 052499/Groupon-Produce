@@ -3,7 +3,6 @@ package com.example.grouponproduceapp.adminFragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.grouponproduceapp.Constants
+import com.example.grouponproduceapp.R
 import com.example.grouponproduceapp.Utils
 import com.example.grouponproduceapp.activity.AdminMainActivity
 import com.example.grouponproduceapp.adapters.AdapterSelectedImgs
+import com.example.grouponproduceapp.databinding.FragmentAddProductBinding
 import com.example.grouponproduceapp.models.Product
 import com.example.grouponproduceapp.viewmodels.AdminVM
-import com.example.grouponproduceapp.R
-import com.example.grouponproduceapp.databinding.FragmentAddProductBinding
 import kotlinx.coroutines.launch
 
 class AddProductFragment : Fragment() {
@@ -34,7 +33,6 @@ class AddProductFragment : Fragment() {
         selectedImgsUri.clear()
         selectedImgsUri.addAll(selectedImgs)
         selectedImgsUri.forEach{
-            Log.d("-------uris-------", it.toString())
         }
         binding.rvProductImgs.adapter = AdapterSelectedImgs(selectedImgsUri)
     }
@@ -62,9 +60,10 @@ class AddProductFragment : Fragment() {
             val productPrice= etProductPrice.text.toString()
             val productStock= etProductStock.text.toString()
             val productCategory= etProductCategory.text.toString()
-            val productType= etProductType.text.toString()
+//            val productType= etProductType.text.toString()
 
-            if (productType.isEmpty() || productCategory.isEmpty() || productTitle.isEmpty()
+//            if (productType.isEmpty() || productCategory.isEmpty() || productTitle.isEmpty()
+            if (productCategory.isEmpty() || productTitle.isEmpty()
                 || productUnit.isEmpty() || productQty.isEmpty() || productPrice.isEmpty() || productStock.isEmpty()){
                 Utils.hideDialog()
                 Utils.showToast(requireContext(), "Empty fields are not allowed!")
@@ -78,7 +77,7 @@ class AddProductFragment : Fragment() {
                     productPrice = productPrice.toInt(),
                     productStock = productStock.toInt(),
                     productQty = productQty.toInt(),
-                    productType = productType,
+//                    productType = productType,
                     productUnit = productUnit,
                     itemCount = 0,
                     adminUid = Utils.getCurrentUserId()
@@ -94,13 +93,15 @@ class AddProductFragment : Fragment() {
             viewModel.isImgsUploaded.collect{
                 if(it) {
                     Utils.hideDialog()
-                    Utils.showToast(requireContext(), "Images saved.")
-
+//                    Utils.showToast(requireContext(), "Images saved.")
+                    Utils.showDialog(requireContext(), "Saving item")
                     lifecycleScope.launch {
                         viewModel.downloadedUrls.collect{
                         product.productImgsUri = it
                         saveProduct(product)
                     } }
+//                    delay(2000)
+                    Utils.hideDialog()
                 }
             }
         }
@@ -113,9 +114,12 @@ class AddProductFragment : Fragment() {
                 if (it) {
                     Utils.hideDialog()
                     startActivity(Intent(requireActivity(), AdminMainActivity::class.java))
-                    Utils.showToast(requireContext(), "Product is live now.")
+                }
+                else{
+//                    Utils.showToast(requireContext(), "Product not uploaded.")
                 }
             }
+            Utils.showToast(requireContext(), "Product is live now.")
         }
 
     }
@@ -123,12 +127,12 @@ class AddProductFragment : Fragment() {
     fun setAutoComplete() {
         val units = ArrayAdapter(requireContext(), R.layout.show_list, Constants.allUnits)
         val categories = ArrayAdapter(requireContext(), R.layout.show_list, Constants.allCategories)
-        val types = ArrayAdapter(requireContext(), R.layout.show_list, Constants.allTypes)
+//        val types = ArrayAdapter(requireContext(), R.layout.show_list, Constants.allTypes)
 
         binding.apply {
             etProductUnit.setAdapter(units)
             etProductCategory.setAdapter(categories)
-            etProductType.setAdapter(types )
+//            etProductType.setAdapter(types )
         }
     }
     fun browseImgs(){
