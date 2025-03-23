@@ -184,3 +184,4 @@ data class ChatModel(
     var receiverId: String? = null,
     var receiverName: String? = null
 )
+
