@@ -1,9 +1,9 @@
-package com.app.growceries.activity
+package com.example.grouponproduceapp.activity
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.app.growceries.R
+import com.example.grouponproduceapp.R
 
 class AuthMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,4 +12,9 @@ class AuthMainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
     }
+
+//    override fun onCreate() {
+//        super.onCreate()
+//        FirebaseApp.initializeApp(this)
+//    }
 }

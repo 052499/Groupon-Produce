@@ -1,12 +1,12 @@
-package com.app.growceries.activity
+package com.example.grouponproduceapp.activity
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
-import com.app.growceries.R
-import com.app.growceries.databinding.ActivityAdminMainBinding
+import com.example.grouponproduceapp.R
+import com.example.grouponproduceapp.databinding.ActivityAdminMainBinding
 
 
 class AdminMainActivity : AppCompatActivity() {
@@ -23,7 +23,5 @@ class AdminMainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.bottomMenu, Navigation.findNavController(this,
             R.id.fragmentContainerView3
         ))
-
-
     }
 }

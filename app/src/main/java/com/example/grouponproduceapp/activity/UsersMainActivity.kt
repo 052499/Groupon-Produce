@@ -1,17 +1,14 @@
-package com.app.growceries.activity
+package com.example.grouponproduceapp.activity
 
-import CartManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.app.growceries.CartListener
-import com.app.growceries.R
-import com.app.growceries.viewmodels.UserVM
-import com.app.growceries.databinding.ActivityUsersBinding
-import com.app.growceries.userFragments.UserChatFragment
+import com.example.grouponproduceapp.CartListener
+import com.example.grouponproduceapp.R
+import com.example.grouponproduceapp.viewmodels.UserVM
+import com.example.grouponproduceapp.databinding.ActivityUsersBinding
 
 class UsersMainActivity : AppCompatActivity(), CartListener {
     private lateinit var binding: ActivityUsersBinding
@@ -36,6 +33,11 @@ class UsersMainActivity : AppCompatActivity(), CartListener {
         updateCartVisibility()
     }
 
+    // Method to hide llCheckout
+    fun hideCheckoutButton() {
+        binding.llCart.visibility = View.GONE
+    }
+
     private fun updateCartVisibility() {
         val totalItemCount = viewModel.fetchTotalItemCount().value ?: 0
         if (totalItemCount > 0) {
@@ -49,18 +51,28 @@ class UsersMainActivity : AppCompatActivity(), CartListener {
     override fun onBackPressed() {
         super.onBackPressed()
         updateCartVisibility()
+        // Check if the current fragment is homeFragment
+//        val currentDestination = findNavController(R.id.fragmentContainerView2).currentDestination?.id
+//        if (currentDestination == R.id.homeFragment) {
+//            // Move the app to the background
+//            moveTaskToBack(true)
+//        } else {
+//            super.onBackPressedDispatcher.onBackPressed()
+//            updateCartVisibility()
+//        }
+
     }
 
-//    private fun getCartItemsCount() {
-//        viewModel.fetchTotalItemCount().observe(this){
-//            if(it>0){
-//                binding.llCart.visibility = View.VISIBLE
-//                binding.nInCart.text = it.toString()
-//            } else {
-//                binding.llCartItems.visibility = View.GONE
-//            }
-//        }
-//    }
+    private fun getCartItemsCount() {
+        viewModel.fetchTotalItemCount().observe(this){
+            if(it>0){
+                binding.llCart.visibility = View.VISIBLE
+                binding.nInCart.text = it.toString()
+            } else {
+                binding.llCartItems.visibility = View.GONE
+            }
+        }
+    }
 
     override fun showCartLayout(itemCount: Int) {
         val prevCount = binding.nInCart.text.toString().toInt()
@@ -78,7 +90,9 @@ class UsersMainActivity : AppCompatActivity(), CartListener {
 
     override fun savingCartItemsCount(itemCount: Int) {
         viewModel.fetchTotalItemCount().observe(this){
+//            Log.d("before_btn_is_clicked", it.toString())
             viewModel.savingCartItemsTotalCount(it+itemCount)
+
         }
     }
 

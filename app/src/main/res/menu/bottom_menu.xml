@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:title="Home"
+        android:icon="@drawable/baseline_home_filled_24"/>
+    <item
+        android:id="@+id/orderAdminFragment"
+        android:title="Track Order"
+        android:icon="@drawable/baseline_notifications_none_24"/>
+    <item
+        android:id="@+id/addProductFragment"
+        android:title="Add Product"
+        android:icon="@drawable/baseline_add_circle_outline_24"/>
+    <item
+        android:id="@+id/profileAdminFragment"
+        android:title="Profile"
+        android:icon="@drawable/baseline_user_24" />
+
+
+</menu>

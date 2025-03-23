@@ -5,10 +5,34 @@
     android:orientation="horizontal"
     android:padding="10dp">
 
-    <TextView
-        android:id="@+id/messageText"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sample message"
-        android:textSize="16sp" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/receiver_message_tv"
+            android:textColor="@color/white"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sample message"
+            android:textSize="16sp"
+            android:background="@drawable/receiver_rounded_textview"/>
+
+        <TextView
+            android:id="@+id/sender_message_tv"
+            android:textAlignment="textEnd"
+            android:layout_gravity="end"
+            android:padding="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sample message"
+            android:textSize="16sp"
+            android:background="@drawable/sender_rounded_textview"/>
+
+    </LinearLayout>
+
+
+
 </LinearLayout>
