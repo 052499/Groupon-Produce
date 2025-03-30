@@ -122,6 +122,7 @@ class UserChatFragment : Fragment() {
             val message = binding.etMessage.text.toString().trim()
 
             if (message.isNotEmpty()) {
+                (message.into to u 
 
                 val myTimeStamp = System.currentTimeMillis() // Convert to seconds
 
