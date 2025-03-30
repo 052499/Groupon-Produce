@@ -1,6 +1,3 @@
-
-
-
 package com.example.grouponproduceapp.userFragments
 
 import android.os.Build
@@ -74,20 +71,19 @@ class OrderSummaryFragment : Fragment() {
                 bundle.putString("userId", adminId)
 
                 findNavController().navigate(R.id.action_global_user_userChatFragment, bundle)
-
-
-//                val pendingIntent = NavDeepLinkBuilder(requireContext())
-//                    .setGraph(R.navigation.chat_nav_graph)
-//                    .setDestination(R.id.userChatFragment)
-//                    .setArguments(bundle)
-//                    .createPendingIntent()
-//                findNavController().handleDeepLink(pendingIntent)
-                //findNavController().navigate(R.id.action_orderSummaryFragment_to_userChatFragment, bundle)
             }
             binding.rvOrderedItems.adapter = adapterOrderedItems
 
             lifecycleScope.launch {
                 val orderedItems = fetchOrderedItemsFromFirestore(userId)
+                if (orderedItems.isEmpty()){
+                    binding.rvOrderedItems.visibility = View.GONE
+                    binding.tvNoOrders.visibility = View.VISIBLE
+                }
+                else {
+                    binding.rvOrderedItems.visibility = View.VISIBLE
+                    binding.tvNoOrders.visibility = View.GONE
+                }
                 val deferreds = orderedItems.map { orderedItem ->
                     async {
                         try {
