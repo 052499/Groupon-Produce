@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/users_nav_graph"
+    app:startDestination="@id/homeFragment"
+    >
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.grouponproduceapp.userFragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment"
+            app:enterAnim="@anim/slide_from_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_categoryFragment"
+            app:destination="@id/categoryFragment"
+            app:enterAnim="@anim/slide_from_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_checkoutFragment"
+            app:destination="@id/checkoutFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_orderSummaryFragment"
+            app:destination="@id/orderSummaryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.grouponproduceapp.userFragments.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            app:enterAnim="@anim/slide_from_left"
+            android:id="@+id/action_searchFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="com.example.grouponproduceapp.userFragments.CategoryFragment"
+        android:label="fragment_category"
+        tools:layout="@layout/fragment_category" >
+        <action
+            android:id="@+id/action_categoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_from_left"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_categoryFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/checkoutFragment"
+        android:name="com.example.grouponproduceapp.userFragments.CheckoutFragment"
+        android:label="fragment_checkout"
+        tools:layout="@layout/fragment_checkout">
+
+        <action
+            android:id="@+id/action_checkoutFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_global_checkoutFragment"
+        app:destination="@id/checkoutFragment" />
+    <fragment
+        android:id="@+id/orderSummaryFragment"
+        android:name="com.example.grouponproduceapp.userFragments.OrderSummaryFragment"
+        android:label="OrderSummaryFragment"
+        tools:layout="@layout/fragment_order_summary">
+
+        <!-- Global Action to Navigate to UserChatFragment -->
+        <action
+            android:id="@+id/action_global_user_userChatFragment"
+            app:destination="@id/chat_nav_graph"/>
+
+<!--        <action-->
+<!--            android:id="@+id/action_orderSummaryFragment_to_userChatFragment"-->
+<!--            app:destination="@id/userChatFragment" />-->
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.grouponproduceapp.userFragments.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile_admin"/>
+
+    <include app:graph="@navigation/chat_nav_graph" />
+    <!--    <fragment-->
+<!--        android:id="@+id/userChatFragment"-->
+<!--        android:name="com.example.grouponproduceapp.userFragments.UserChatFragment"-->
+<!--        android:label="UserChatFragment"-->
+<!--        tools:layout="@layout/fragment_user_chat"/>-->
+
+</navigation>

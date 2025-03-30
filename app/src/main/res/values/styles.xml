@@ -1,0 +1,18 @@
+<resources>
+    <style name="CustomButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CustomDropdownItem" parent="Widget.AppCompat.ListPopupWindow">
+        <!-- Customize dropdown items padding -->
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingEnd">10dp</item>
+
+        <!-- Adjust text size for dropdown items -->
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>
