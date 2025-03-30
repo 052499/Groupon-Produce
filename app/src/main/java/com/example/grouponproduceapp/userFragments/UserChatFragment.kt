@@ -108,60 +108,6 @@ class UserChatFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        // Set up RecyclerView
-        recyclerView = binding.recyclerViewMessages
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-//        recyclerView.setHasFixedSize(true)
-        //messageList = getSampleMessages()
-
-
-        binding.btnSend.setOnClickListener {
-            val message = binding.etMessage.text.toString().trim()
-
-            if (message.isNotEmpty()) {
-
-                val myTimeStamp = System.currentTimeMillis() // Convert to seconds
-
-                val user = FirebaseAuth.getInstance().currentUser
-                val id = user?.uid ?: ""
-                val name = user?.displayName ?: ""
-
-                val params = hashMapOf(
-                    "message" to message,
-                    "sender_id" to id,
-                    "sender_name" to name,
-                    "receiver_id" to userId,
-                    "receiver_name" to userName,
-                    "order_id" to orderId,
-                    "timestamp" to myTimeStamp
-                )
-
-                val db = FirebaseFirestore.getInstance()
-                val path = "chats"
-
-                db.collection(path).add(params)
-                    .addOnSuccessListener {
-                        getAllChat()
-                        binding.etMessage.setText("")
-                    }
-                    .addOnFailureListener {
-                    }
-            }
-        }
-    }
-
-    private fun getSampleMessages(): MutableList<String> {
-        return listOf("").toMutableList()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     private fun statusBarColor() {
         activity?.window?.apply {
             val statusBarColors = ContextCompat.getColor(
