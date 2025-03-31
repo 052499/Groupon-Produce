@@ -39,9 +39,6 @@ class UserChatFragment : Fragment() {
         orderId = arguments?.getString("orderId").toString()
         userId = arguments?.getString("userId").toString()
 
-        println("Received Order ID: $orderId, Received user ID: $userId")
-
-
         binding.toolBarChatFragment.setOnClickListener{
             activity?.supportFragmentManager?.popBackStack()
         }
@@ -122,7 +119,6 @@ class UserChatFragment : Fragment() {
             val message = binding.etMessage.text.toString().trim()
 
             if (message.isNotEmpty()) {
-                (message.into to u 
 
                 val myTimeStamp = System.currentTimeMillis() // Convert to seconds
 

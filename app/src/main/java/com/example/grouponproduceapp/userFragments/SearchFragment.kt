@@ -48,12 +48,6 @@ class SearchFragment : Fragment() {
         binding.btnBack.setOnClickListener{
             activity?.supportFragmentManager?.popBackStack()
         }
-
-//        binding.cvSearch.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
-//            // Navigate back to HomeFragment
-//            activity?.supportFragmentManager?.popBackStack()
-//        }
-
         return binding.root
     }
 
@@ -99,7 +93,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun onAddBtnClicked(product: Product, productBinding: ItemVuProductBinding){
-        Log.d("add-add-add-add-add1", productBinding.tvProductCount.text.toString().toInt().toString())
+//        Log.d("add-add-add-add-add1", productBinding.tvProductCount.text.toString().toInt().toString())
 
         productBinding.tvAdd.visibility = View.GONE
         productBinding.llProductCount.visibility = View.VISIBLE
@@ -107,39 +101,38 @@ class SearchFragment : Fragment() {
 
         var itemCount = productBinding.tvProductCount.text.toString().toInt()
         itemCount++
-        Log.d("add-add-add-add-add2", itemCount.toString())
+//        Log.d("add-add-add-add-add2", itemCount.toString())
         productBinding.tvProductCount.text= itemCount.toString()
 
         cartManager.addProductToCart(product.productId, 1)
-//        productBinding.tvProductCount.text = itemCount.toString()
-
         cartListener?.showCartLayout(1)
         cartListener?.savingCartItemsCount(1)
     }
 
     fun onIncrementBtnClicked(product: Product, productBinding: ItemVuProductBinding){
-        Log.d("inc-inc-inc-inc-inc1", productBinding.tvProductCount.text.toString().toInt().toString())
+//        Log.d("inc-inc-inc-inc-inc1", productBinding.tvProductCount.text.toString().toInt().toString())
 
         var itemCount = productBinding.tvProductCount.text.toString().toInt()
         itemCount++
-        Log.d("inc-inc-inc-inc-inc2", itemCount.toString())
+//        Log.d("inc-inc-inc-inc-inc2", itemCount.toString())
 
         productBinding.tvProductCount.text= itemCount.toString()
         //new1
         cartManager.addProductToCart(product.productId, 1)
+//        Log.d("inc-inc-inc3", itemCount.toString())
 
         cartListener?.showCartLayout(1)
         cartListener?.savingCartItemsCount(1)
     }
     fun onDecrementBtnClicked(product: Product, productBinding: ItemVuProductBinding){
-        Log.d("dec-dec-dec-dec-dec1", productBinding.tvProductCount.text.toString().toInt().toString())
+//        Log.d("dec-dec-dec-dec-dec1", productBinding.tvProductCount.text.toString().toInt().toString())
         var itemCount = productBinding.tvProductCount.text.toString().toInt()
         itemCount--
-        Log.d("dec-dec-dec-dec-dec2", itemCount.toString())
+//        Log.d("dec-dec-dec-dec-dec2", itemCount.toString())
         if (itemCount > 0) {
             cartManager.addProductToCart(product.productId, -1)
         } else if (itemCount == 0) {
-            Log.d("dec-dec-dec-dec-dec3", itemCount.toString())
+//            Log.d("dec-dec-dec-dec-dec3", itemCount.toString())
 
             cartManager.addProductToCart(product.productId, -1)
             productBinding.tvAdd.visibility = View.VISIBLE
@@ -147,7 +140,6 @@ class SearchFragment : Fragment() {
         }
 
         //new1
-//        cartManager.addProductToCart(product.productId, -1)
         productBinding.tvProductCount.text = itemCount.toString()
         cartListener?.showCartLayout(-1)
         cartListener?.savingCartItemsCount(-1)

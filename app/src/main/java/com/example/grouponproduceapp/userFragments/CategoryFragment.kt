@@ -81,7 +81,6 @@ class CategoryFragment : Fragment() {
                 adapterProduct = AdapterProduct(::onAddBtnClicked, ::onIncrementBtnClicked, ::onDecrementBtnClicked, sharedPref)
                 binding.rvProducts.adapter = adapterProduct
                 adapterProduct.differList.submitList(it)
-//                adapterProduct.originalList = it as ArrayList<Product>
             }
         }
     }

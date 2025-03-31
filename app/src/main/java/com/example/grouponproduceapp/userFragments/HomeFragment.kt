@@ -66,22 +66,11 @@ class HomeFragment : Fragment() {
 
     private fun navigateToOrderStatus() {
         findNavController().navigate(R.id.action_homeFragment_to_orderSummaryFragment)
-//        val targetFragment= OrderSummaryFragment()
-//        parentFragmentManager.beginTransaction().replace(R.id.homeFragment, targetFragment)
-//            .addToBackStack(null)
-//            .commit()
     }
 
     private fun navigateToProfile() {
         findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
     }
-
-//    private fun startChat() {
-//        binding.fabChat.setOnClickListener {
-//            val userChatFragment = UserChatFragment()
-//            userChatFragment.show(requireActivity().supportFragmentManager, "ChatDialog")
-//        }
-//    }
 
     private fun onCategoryClicked(category: Category) {
         val bundle = Bundle()
