@@ -8,30 +8,49 @@ import com.example.grouponproduceapp.databinding.FragmentPaymentBinding
 
 class PaymentFragment : DialogFragment() {
 
-    private lateinit var binding: FragmentPaymentBinding
+    private var _binding: FragmentPaymentBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentPaymentBinding.inflate(inflater, container, false)
-
-        // Set up the payment method when the user clicks the "Pay Now" button
-        binding.btnProceedToPayment.setOnClickListener {
-            val cardInputWidget = binding.cardInputWidget
-            val paymentMethodCreateParams = cardInputWidget.paymentMethodCreateParams
-
-            if (paymentMethodCreateParams != null) {
-                val bundle = Bundle().apply {
-                    putParcelable("paymentMethodCreateParams", paymentMethodCreateParams)
-                }
-                parentFragmentManager.setFragmentResult("paymentResult", bundle)
-                dismiss()  // Dismiss the dialog after payment processing starts
-            } else {
-                Toast.makeText(requireContext(), "Invalid card details", Toast.LENGTH_SHORT).show()
-            }
-        }
-
+    ): View {
+        _binding = FragmentPaymentBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        binding.btnProceedToPayment.setOnClickListener {
+            processPayment()
+        }
+    }
+
+    private fun processPayment() {
+        val paymentMethodCreateParams = binding.cardInputWidget.paymentMethodCreateParams
+        if (paymentMethodCreateParams != null) {
+            parentFragmentManager.setFragmentResult(
+                "paymentResult", Bundle().apply {
+                    putParcelable("paymentMethodCreateParams", paymentMethodCreateParams)
+                }
+            )
+            dismiss()  // Close the dialog after processing
+        } else {
+            showToast("Invalid card details. Please try again.")
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
+
