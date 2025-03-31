@@ -87,7 +87,7 @@ class AdminVM: ViewModel() {
     }
 
     fun removeProductFromFirestore(productId: String, onComplete: (Boolean) -> Unit) {
-            Log.d("removeProduct", "Attempting to remove product from Realtime Database: $productId")
+//            Log.d("removeProduct", "Attempting to remove product from Realtime Database: $productId")
 
             // Reference to Realtime Database
             val realtimeDb = FirebaseDatabase.getInstance()
@@ -105,7 +105,7 @@ class AdminVM: ViewModel() {
 
     fun fetchOrdersForAdmin(adminId: String): Flow<List<Pair<String, OrderDetailz>>> = callbackFlow {
         val ordersRef = FirebaseFirestore.getInstance().collection("orders")
-        Log.d("AVM---1fetchOrdersForAdmin", ordersRef.toString())
+//        Log.d("AVM---1fetchOrdersForAdmin", ordersRef.toString())
 
         // Use addSnapshotListener for Firestore
         val eventListener = ordersRef.addSnapshotListener { snapshot, error ->
@@ -115,16 +115,16 @@ class AdminVM: ViewModel() {
             }
 
             val orders = mutableListOf<Pair<String, OrderDetailz>>()
-            Log.d("AVM---2fetchOrdersForAdmin", orders.toString())
+//            Log.d("AVM---2fetchOrdersForAdmin", orders.toString())
 
             snapshot?.documents?.forEach { orderSnapshot ->
                 val order = orderSnapshot.toObject(OrderDetailz::class.java)
-                Log.d("AVM---3fetchOrdersForAdmin", order.toString())
+//                Log.d("AVM---3fetchOrdersForAdmin", order.toString())
                 val orderId = orderSnapshot.id // This is the Firestore document ID
                 
 //                val hasAdminId = order?.orderDetails?.any { it.adminId?.trim() == adminId?.trim() } == true
                 val hasAdminId = order?.adminId?.trim() == adminId?.trim()
-                Log.d("AVM---4fetchOrdersForAdmin", "current user: ${adminId}   |   current user is admin in order:  ${hasAdminId}")
+//                Log.d("AVM---4fetchOrdersForAdmin", "current user: ${adminId}   |   current user is admin in order:  ${hasAdminId}")
                 if (hasAdminId && order != null) {
                     orders.add(Pair(orderId, order)) // Store both document ID and order
                 }
@@ -136,21 +136,4 @@ class AdminVM: ViewModel() {
         // Make sure to close the listener when the flow is closed
         awaitClose { eventListener.remove() }
     }
-
-//    fun updateOrderStatus(orderId: String, newStatus: String, onComplete: (Boolean) -> Unit) {
-//        val orderRef = FirebaseFirestore.getInstance().collection("orders").document(orderId)
-//
-//        orderRef.update("orderStatus", newStatus)
-//            .addOnSuccessListener {
-//                Log.d("AdminVM", "${orderId}  Order status updated successfully")
-//                onComplete(true)
-//            }
-//            .addOnFailureListener { e ->
-//                Log.e("AdminVM", "Error updating order status: ${e.message}")
-//                onComplete(false)
-//            }
-//    }
-
-
-
 }

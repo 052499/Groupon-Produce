@@ -1,7 +1,6 @@
 package com.example.grouponproduceapp.viewmodels
 
 import android.app.Application
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.util.Log
@@ -98,26 +97,14 @@ class UserVM(application: Application) : AndroidViewModel(application) {
         val type: Type = object : TypeToken<ArrayList<CartItem>>() {}.type // Specify the correct type
         var cartItems= Gson().fromJson(cartJson, type) as List<CartItem>
 
+        cartItems = cartItems.filter { it.quantity > 0 }
+
         var totalItemCount = 0
 
         cartItems.forEach { cartItem ->
-//            Log.d("ooooooooooo", cartItem.quantity.toString())
             totalItemCount += cartItem.quantity
         }
         totalItemCountLiveData.value = totalItemCount
         return totalItemCountLiveData
     }
-
-    fun saveUserType(context: Context, userType: String) {
-        val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("USER_TYPE", userType)
-        editor.apply() // Asynchronously saves the data
-    }
-
-    fun getUserType(context: Context): String? {
-        val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("USER_TYPE", null) // Default is null if not found
-    }
-
 }
