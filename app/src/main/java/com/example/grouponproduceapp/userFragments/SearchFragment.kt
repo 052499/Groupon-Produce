@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.grouponproduceapp.CartListener
 import com.example.grouponproduceapp.R
+import com.example.grouponproduceapp.Utils
 import com.example.grouponproduceapp.adapters.AdapterProduct
 import com.example.grouponproduceapp.models.Product
 import com.example.grouponproduceapp.viewmodels.UserVM
@@ -95,34 +96,45 @@ class SearchFragment : Fragment() {
     private fun onAddBtnClicked(product: Product, productBinding: ItemVuProductBinding){
 //        Log.d("add-add-add-add-add1", productBinding.tvProductCount.text.toString().toInt().toString())
 
-        productBinding.tvAdd.visibility = View.GONE
-        productBinding.llProductCount.visibility = View.VISIBLE
+        if (product.productStock ?: 0 > 0) {
+            productBinding.tvAdd.visibility = View.GONE
+            productBinding.llProductCount.visibility = View.VISIBLE
 
-
-        var itemCount = productBinding.tvProductCount.text.toString().toInt()
-        itemCount++
+            var itemCount = productBinding.tvProductCount.text.toString().toInt()
+            Log.d("------------", "$itemCount")
+            itemCount++
 //        Log.d("add-add-add-add-add2", itemCount.toString())
-        productBinding.tvProductCount.text= itemCount.toString()
+            productBinding.tvProductCount.text = itemCount.toString()
 
-        cartManager.addProductToCart(product.productId, 1)
-        cartListener?.showCartLayout(1)
-        cartListener?.savingCartItemsCount(1)
+            cartManager.addProductToCart(product.productId, 1)
+            cartListener?.showCartLayout(1)
+            cartListener?.savingCartItemsCount(1)
+        }
+        else {
+            Utils.showToast(requireContext(), "Item is out of Stock.")
+        }
     }
 
     fun onIncrementBtnClicked(product: Product, productBinding: ItemVuProductBinding){
 //        Log.d("inc-inc-inc-inc-inc1", productBinding.tvProductCount.text.toString().toInt().toString())
 
         var itemCount = productBinding.tvProductCount.text.toString().toInt()
-        itemCount++
+        val stock= product.productStock ?: 0
+
+        if (itemCount < stock){
+            itemCount++
 //        Log.d("inc-inc-inc-inc-inc2", itemCount.toString())
 
-        productBinding.tvProductCount.text= itemCount.toString()
-        //new1
-        cartManager.addProductToCart(product.productId, 1)
+            productBinding.tvProductCount.text= itemCount.toString()
+            //new1
+            cartManager.addProductToCart(product.productId, 1)
 //        Log.d("inc-inc-inc3", itemCount.toString())
 
-        cartListener?.showCartLayout(1)
-        cartListener?.savingCartItemsCount(1)
+            cartListener?.showCartLayout(1)
+            cartListener?.savingCartItemsCount(1)
+        } else {
+            Utils.showToast(requireContext(), "Maximum stock limit reached.")
+        }
     }
     fun onDecrementBtnClicked(product: Product, productBinding: ItemVuProductBinding){
 //        Log.d("dec-dec-dec-dec-dec1", productBinding.tvProductCount.text.toString().toInt().toString())

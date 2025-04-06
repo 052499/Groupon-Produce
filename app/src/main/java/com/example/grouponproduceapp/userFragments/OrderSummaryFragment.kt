@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 
-class OrderSummaryFragment : Fragment() {
+class  OrderSummaryFragment : Fragment() {
     private lateinit var binding: FragmentOrderSummaryBinding
     private lateinit var adapterOrderedItems: AdapterOrderSummary
     private lateinit var firestore: FirebaseFirestore
@@ -99,6 +99,7 @@ class OrderSummaryFragment : Fragment() {
                                 orderStatus = orderedItem.orderStatus,
                                 orderDetails = orderedItem.orderDetails.map { detail ->
                                     OrderedItemDetails(
+                                        orderId = orderedItem.orderId,
                                         productId = detail.productId,
                                         productName = detail.productName,
                                         productQty = detail.productQty,
