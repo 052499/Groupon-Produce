@@ -17,6 +17,7 @@ data class OrderDetailz(
 }
 
 data class OrderedItemDetails(
+    val orderId: String = "",
     val productId: String = "",
     val adminId: String? = null,
     val productName: String? = "",
