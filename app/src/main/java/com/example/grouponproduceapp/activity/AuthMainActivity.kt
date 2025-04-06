@@ -12,9 +12,4 @@ class AuthMainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
     }
-
-//    override fun onCreate() {
-//        super.onCreate()
-//        FirebaseApp.initializeApp(this)
-//    }
 }

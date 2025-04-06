@@ -1,5 +1,7 @@
 package com.example.grouponproduceapp.activity
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -9,15 +11,23 @@ import com.example.grouponproduceapp.CartListener
 import com.example.grouponproduceapp.R
 import com.example.grouponproduceapp.viewmodels.UserVM
 import com.example.grouponproduceapp.databinding.ActivityUsersBinding
+import com.example.grouponproduceapp.models.CartItem
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 class UsersMainActivity : AppCompatActivity(), CartListener {
     private lateinit var binding: ActivityUsersBinding
     private val viewModel : UserVM by viewModels()
+    private lateinit var sharedPref : SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUsersBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPref = this.getSharedPreferences("cart_items", Context.MODE_PRIVATE)
 
         updateCartVisibility()
         binding.llCheckout.setOnClickListener {
@@ -29,17 +39,16 @@ class UsersMainActivity : AppCompatActivity(), CartListener {
 
     override fun onResume() {
         super.onResume()
-        // Every time the activity comes to the foreground, update the cart count
         updateCartVisibility()
     }
 
-    // Method to hide llCheckout
     fun hideCheckoutButton() {
         binding.llCart.visibility = View.GONE
     }
 
-    private fun updateCartVisibility() {
+    fun updateCartVisibility() {
         val totalItemCount = viewModel.fetchTotalItemCount().value ?: 0
+//        Log.d("UpdateCartVisibility","total item count is    $totalItemCount")
         if (totalItemCount > 0) {
             binding.llCart.visibility = View.VISIBLE
             binding.nInCart.text = totalItemCount.toString()
@@ -51,37 +60,22 @@ class UsersMainActivity : AppCompatActivity(), CartListener {
     override fun onBackPressed() {
         super.onBackPressed()
         updateCartVisibility()
-        // Check if the current fragment is homeFragment
-//        val currentDestination = findNavController(R.id.fragmentContainerView2).currentDestination?.id
-//        if (currentDestination == R.id.homeFragment) {
-//            // Move the app to the background
-//            moveTaskToBack(true)
-//        } else {
-//            super.onBackPressedDispatcher.onBackPressed()
-//            updateCartVisibility()
-//        }
-
-    }
-
-    private fun getCartItemsCount() {
-        viewModel.fetchTotalItemCount().observe(this){
-            if(it>0){
-                binding.llCart.visibility = View.VISIBLE
-                binding.nInCart.text = it.toString()
-            } else {
-                binding.llCartItems.visibility = View.GONE
-            }
-        }
     }
 
     override fun showCartLayout(itemCount: Int) {
-        val prevCount = binding.nInCart.text.toString().toInt()
-        val updatedTotalCount = prevCount + itemCount
+        var cartJson= sharedPref.getString("cart_items", "[]")
+        val type: Type = object : TypeToken<ArrayList<CartItem>>() {}.type // Specify the correct type
+        val cartItems: ArrayList<CartItem> = Gson().fromJson(cartJson, type)
+        var existingItems = cartItems.filter { it.quantity > 0 }
+        var prevCount = 0
+        existingItems.forEach {
+            prevCount += it.quantity
+        }
 
+        val updatedTotalCount = prevCount + itemCount
         if(updatedTotalCount > 0) {
             binding.llCart.visibility = View.VISIBLE
             binding.nInCart.text = updatedTotalCount.toString()
-
         } else {
             binding.llCart.visibility = View.GONE
             binding.nInCart.text = "0"
@@ -90,10 +84,7 @@ class UsersMainActivity : AppCompatActivity(), CartListener {
 
     override fun savingCartItemsCount(itemCount: Int) {
         viewModel.fetchTotalItemCount().observe(this){
-//            Log.d("before_btn_is_clicked", it.toString())
             viewModel.savingCartItemsTotalCount(it+itemCount)
-
         }
     }
-
 }
