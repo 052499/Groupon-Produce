@@ -163,6 +163,18 @@ class UserChatFragment : Fragment() {
                         userId to false // Receiver's read status (false because it's unread initially)
                     )
                 )
+
+                val db = FirebaseFirestore.getInstance()
+                val path = "chats"
+
+                db.collection(path).add(params)
+                    .addOnSuccessListener {
+                        getAllChat()
+                        binding.etMessage.setText("")
+                    }
+                    .addOnFailureListener {
+                    }
+            }
         }
     }
 
