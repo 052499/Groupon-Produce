@@ -22,18 +22,18 @@ class AdapterChat(private val messages: List<ChatModel>) : RecyclerView.Adapter<
 
         holder.bind(message, senderId)
 
-//        // Check read status and show the appropriate "read receipt" only on the sender's side
-//        if (senderId == uid) {
-//            // Sender's side: Check if the receiver has read the message
-//            if (message.readStatus?.get(message.receiverId) == true) {
-//                holder.binding.readReceiptTv.isVisible = true
-//            } else {
-//                holder.binding.readReceiptTv.isVisible = false
-//            }
-//        } else {
-//            // Receiver's side: Don't show the read receipt
-//            holder.binding.readReceiptTv.isVisible = false
-//        }
+       Check read status and show the appropriate "read receipt" only on the sender's side
+        if (senderId == uid) {
+             Sender's side: Check if the receiver has read the message
+           if (message.readStatus?.get(message.receiverId) == true) {
+               holder.binding.readReceiptTv.isVisible = true
+           } else {
+               holder.binding.readReceiptTv.isVisible = false
+           }
+      } else {
+        // Receiver's side: Don't show the read receipt
+        holder.binding.readReceiptTv.isVisible = false
+       }
     }
 
     override fun getItemCount(): Int {
