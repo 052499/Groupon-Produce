@@ -47,10 +47,25 @@ class OrderAdminFragment : Fragment() {
         // Fetch orders for the admin
         adminId?.let {
             lifecycleScope.launch {
-                Log.d("OAF-1onCreateView", adminId.toString())
+                Log.d("OAF-onCreateView1", adminId.toString())
                 adminVM.fetchOrdersForAdmin(it).collect { orders ->
-                    Log.d("OAF-2onCreateView", orders.toString())
-                    adapter.setOrders(orders)
+                    Log.d("OAF-onCreateView2", "Orders are:  $orders")
+                    if (orders.isEmpty()){
+                        Log.d("OAF-onCreateView3", "found no orders.")
+                        binding.rvAdminOrders.visibility = View.GONE
+                        binding.tvNoOrders.visibility = View.VISIBLE
+                    }
+                    else {
+                        Log.d("OAF-onCreateView3", "found orders.")
+                        binding.rvAdminOrders.visibility = View.VISIBLE
+                        binding.tvNoOrders.visibility = View.GONE
+                    }
+
+                    val filteredOrders = orders.filter { (_, order) ->
+                        order.orderDetails?.any { it.adminId == adminId } == true
+                    }
+//                    Log.d("OAF-2onCreateView", orders.toString())
+                    adapter.setOrders(filteredOrders)
                 }
             }
         }

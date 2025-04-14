@@ -105,7 +105,7 @@ class AdminVM: ViewModel() {
 
     fun fetchOrdersForAdmin(adminId: String): Flow<List<Pair<String, OrderDetailz>>> = callbackFlow {
         val ordersRef = FirebaseFirestore.getInstance().collection("orders")
-//        Log.d("AVM---1fetchOrdersForAdmin", ordersRef.toString())
+        Log.d("AVM---1fetchOrdersForAdmin", ordersRef.toString())
 
         // Use addSnapshotListener for Firestore
         val eventListener = ordersRef.addSnapshotListener { snapshot, error ->
@@ -115,18 +115,22 @@ class AdminVM: ViewModel() {
             }
 
             val orders = mutableListOf<Pair<String, OrderDetailz>>()
-//            Log.d("AVM---2fetchOrdersForAdmin", orders.toString())
+            Log.d("AVM---2fetchOrdersForAdmin", "$snapshot   size is ${snapshot?.size()}")
+
 
             snapshot?.documents?.forEach { orderSnapshot ->
                 val order = orderSnapshot.toObject(OrderDetailz::class.java)
-//                Log.d("AVM---3fetchOrdersForAdmin", order.toString())
+                Log.d("AVM---3fetchOrdersForAdmin", order.toString())
                 val orderId = orderSnapshot.id // This is the Firestore document ID
-                
-//                val hasAdminId = order?.orderDetails?.any { it.adminId?.trim() == adminId?.trim() } == true
-                val hasAdminId = order?.adminId?.trim() == adminId?.trim()
-//                Log.d("AVM---4fetchOrdersForAdmin", "current user: ${adminId}   |   current user is admin in order:  ${hasAdminId}")
-                if (hasAdminId && order != null) {
-                    orders.add(Pair(orderId, order)) // Store both document ID and order
+
+                // Filter the order details to include only items that match the adminId
+                val filteredOrderDetails = order?.orderDetails?.filter { it.adminId?.trim() == adminId?.trim() }
+
+                // Only add the order if there are matching items for the admin
+                if (!filteredOrderDetails.isNullOrEmpty()) {
+                    // Create a new order with only the filtered order details
+                    val filteredOrder = order.copy(orderDetails = filteredOrderDetails)
+                    orders.add(Pair(orderId, filteredOrder)) // Add the filtered order
                 }
             }
 

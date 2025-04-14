@@ -1,5 +1,6 @@
 package com.example.grouponproduceapp.adapters
 
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -21,7 +22,7 @@ class AdapterChat(private val messages: List<ChatModel>) : RecyclerView.Adapter<
         val uid = FirebaseAuth.getInstance().uid ?: ""
 
         holder.bind(message, senderId)
-        
+
 //        // Check read status and show the appropriate "read receipt" only on the sender's side
 //        if (senderId == uid) {
 //            // Sender's side: Check if the receiver has read the message
@@ -34,6 +35,7 @@ class AdapterChat(private val messages: List<ChatModel>) : RecyclerView.Adapter<
 //            // Receiver's side: Don't show the read receipt
 //            holder.binding.readReceiptTv.isVisible = false
 //        }
+    }
 
     override fun getItemCount(): Int {
         return messages.size

@@ -52,28 +52,49 @@
 
         </LinearLayout>
 
-        <!-- Chat Button -->
-        <TextView
-            android:layout_marginTop="16dp"
-            android:id="@+id/tvChat"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="  Chat"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:background="@drawable/rounded_button"
-            android:layout_gravity="start"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:drawableLeft="@drawable/baseline_chat_24"
-            android:paddingEnd="15dp"
-            android:paddingStart="15dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            />
+            android:layout_height="wrap_content">
+
+            <!-- Chat Button -->
+            <TextView
+                android:layout_marginTop="16dp"
+                android:id="@+id/tvChat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  Chat"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:background="@drawable/rounded_button"
+                android:layout_gravity="start"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:drawableLeft="@drawable/baseline_chat_24"
+                android:paddingEnd="15dp"
+                android:paddingStart="15dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                />
+
+            <!-- Red Dot -->
+            <View
+                android:id="@+id/redDot"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@android:color/holo_red_dark"
+                android:layout_alignEnd="@+id/tvChat"
+                android:layout_alignTop="@+id/tvChat"
+                android:visibility="gone"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:shape="oval" />
+
+        </RelativeLayout>
+
+
 
         <!-- Product Details (Looped for each product in order) -->
         <LinearLayout

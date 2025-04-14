@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -73,7 +72,7 @@ class HomeAdminFragment : Fragment() {
     private fun getAllProducts(categoryTitle: String?) {
         lifecycleScope.launch {
             adminVM.fetchProducts(FirebaseAuth.getInstance().currentUser?.uid, categoryTitle).collect(){
-                Log.d("HAF-HAF-HAF-HAF", "$categoryTitle        ${it}")
+//                Log.d("HAF-HAF-HAF-HAF", "$categoryTitle        ${it}")
                 if (it.isEmpty()){
                     binding.rvProducts.visibility = View.GONE
                     binding.tvNoProduct.visibility = View.VISIBLE
@@ -82,8 +81,6 @@ class HomeAdminFragment : Fragment() {
                     binding.rvProducts.visibility = View.VISIBLE
                     binding.tvNoProduct.visibility = View.GONE
                 }
-//                val adapterProduct = AdapterProduct(::onSaveBtnClicked)
-//                adapterProduct = AdapterProductAdmin(adminVM)
                 binding.rvProducts.adapter = adapterProduct
                 adapterProduct.differList.submitList(it)
                 adapterProduct.originalList = it as ArrayList<Product>
@@ -113,23 +110,6 @@ class HomeAdminFragment : Fragment() {
     private fun onCategoryClicked(category: Category){
         getAllProducts(category.title)
     }
-
-//    fun onSaveBtnClicked(product: Product){
-//        val editProduct = EditProductLayoutBinding.inflate(LayoutInflater.from(requireContext()))
-//        editProduct.apply {
-//            etProductQty.setText(product.productQty.toString())
-//            etProductType.setText(product.productType)
-//            etProductPrice.setText(product.productPrice.toString())
-//            etProductStock.setText(product.productStock.toString())
-//            etProductUnit.setText(product.productUnit)
-//            etProductCategory.setText(product.productCategory)
-//            etProductTitle.setText(product.productTitle)
-//        }
-//        val alertDialog = AlertDialog.Builder(requireContext())
-//            .setView(editProduct.root)
-//            .create()
-//        alertDialog.show()
-//    }
 
     private fun statusBarColor() {
         activity?.window?.apply {

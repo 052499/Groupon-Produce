@@ -63,7 +63,7 @@ class LoginFragment : Fragment() {
                         db.collection("users").document(userId).get()
                             .addOnSuccessListener { document ->
                                 if (document != null) {
-                                    if (document.getString("role") == "admin") {
+                                    if (document.getString("role")?.uppercase() == "ADMIN") {
                                         val intent = Intent(requireActivity(), AdminMainActivity::class.java)
                                         startActivity(intent)
                                     } else {

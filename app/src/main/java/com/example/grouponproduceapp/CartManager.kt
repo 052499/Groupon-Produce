@@ -15,15 +15,15 @@ class CartManager(private val sharedPreferences: SharedPreferences) {
 
     private val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-    // Function to add a product to the cart or update its quantity
+
     fun addProductToCart(productId: String, quantity: Int) {
         val cartJson = sharedPreferences.getString("cart_items", "[]")
-        val type: Type =
-            object : TypeToken<ArrayList<CartItem>>() {}.type // Specify the correct type
+        val type: Type = object : TypeToken<ArrayList<CartItem>>() {}.type // Specify the correct type
         val cartItems: ArrayList<CartItem> = Gson().fromJson(cartJson, type)
 
         // Check if the product is already in the cart
         val existingItem = cartItems.find { it.productId == productId }
+
         val productRef = FirebaseDatabase.getInstance().getReference("Admins/products").child(productId)
 
         productRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -31,37 +31,35 @@ class CartManager(private val sharedPreferences: SharedPreferences) {
                 if (snapshot.exists()) {
                     val product = snapshot.getValue(Product::class.java)
                     val stock = product?.productStock ?: 0
+
                     if (quantity == 1) {
                         if (existingItem == null || existingItem.quantity < stock) {
                             if (existingItem != null) {
                                 existingItem.quantity += 1
-                                Log.d("APTC-APTC-APTC-APTC-APTC+1", "item found: quantity: $quantity  stock: $stock  existingItemQty: ${existingItem?.quantity}  ${productId}")
+//                                Log.d("APTC-APTC-APTC-APTC-APTC+1", "item found: quantity: $quantity  stock: $stock  existingItemQty: ${existingItem?.quantity}  ${productId}")
                             } else {
                                 cartItems.add(CartItem(productId, 1))
-                                Log.d("APTC-APTC-APTC-APTC-APTC+1", "item added: quantity: $quantity  stock: $stock  existingItemQty: ${existingItem?.quantity}   ${productId}")
+//                                Log.d("APTC-APTC-APTC-APTC-APTC+1", "item added: quantity: $quantity  stock: $stock  existingItemQty: ${existingItem?.quantity}   ${productId}")
                             }
                             val updatedCartJson = Gson().toJson(cartItems)
                             editor.putString("cart_items", updatedCartJson).apply()
-                            Log.d("APTC-APTC-APTC-APTC-APTC+1", "all items: ${updatedCartJson}")
-
+//                            Log.d("APTC-APTC-APTC-APTC-APTC+1", "all items: ${updatedCartJson}")
                         } else {
                             Log.d("CartManager", "Cannot add more items. Stock limit reached.")
                         }
-                    }
-                    else if (quantity == -1) {
-                        Log.d("APTC-APTC-APTC-APTC-APTC-1", quantity.toString())
+                    } else if (quantity == -1) {
+//                        Log.d("APTC-APTC-APTC-APTC-APTC-1", "item minused: quantity: $quantity  stock: $stock  existingItemQty: ${existingItem?.quantity}   ${productId}")
                         if (existingItem != null && existingItem.quantity > 0) {
                             existingItem.quantity -= 1
-                            Log.d("APTC-APTC-APTC-APTC-APTC-11", "${quantity}     ${existingItem.quantity}")
+//                            Log.d("APTC-APTC-APTC-APTC-APTC-11", "${quantity}     ${existingItem.quantity}")
                             if (existingItem.quantity == 0) {
-                                Log.d("APTC-APTC-APTC-APTC-APTC-12", existingItem.toString())
+//                                Log.d("APTC-APTC-APTC-APTC-APTC-12", existingItem.toString())
                                 removeProductFromCart(productId) // Remove product if quantity is zero
                             }
                             val updatedCartJson = Gson().toJson(cartItems)
                             editor.putString("cart_items", updatedCartJson).apply()
                         }
                     }
-
                 } else {
                     // If the product doesn't exist in the database
                     Log.d("RealtimeDB", "Product document does not exist.")
@@ -74,8 +72,8 @@ class CartManager(private val sharedPreferences: SharedPreferences) {
         })
     }
 
-    // Function to get all items from the cart
     fun getCartItems(sharedPref: String): List<CartItem> {
+
         val cartJson = sharedPreferences.getString(sharedPref, "[]")
         val type: Type =
             object : TypeToken<ArrayList<CartItem>>() {}.type // Specify the correct type
@@ -89,7 +87,7 @@ class CartManager(private val sharedPreferences: SharedPreferences) {
             object : TypeToken<ArrayList<CartItem>>() {}.type // Specify the correct type
         val cartItems: ArrayList<CartItem> = Gson().fromJson(cartJson, type)
         val cartItem = cartItems.find { it.productId == productId }
-        Log.d("GPQ-GPQ-GPQ-GPQ-GPQ", cartItem?.quantity.toString())
+//        Log.d("GPQ-GPQ-GPQ-GPQ-GPQ", cartItem?.quantity.toString())
         return cartItem?.quantity ?: 0 // Return 0 if not found
     }
 
@@ -106,20 +104,18 @@ class CartManager(private val sharedPreferences: SharedPreferences) {
         val cartItems: ArrayList<CartItem> = Gson().fromJson(cartJson, type)
 
         // Remove the product with the given productId
-        val updatedCartItems = cartItems.filterNot { it.productId == productId }
+        val updatedCartItems = cartItems.filterNot { it.productId == productId || it.quantity == 0 }
         // Save the updated list back to SharedPreferences
         val updatedCartJson = Gson().toJson(updatedCartItems)
-        Log.d("RPFT-RPFT-RPFT-RPFT-RPFT-1", updatedCartJson.toString())
+//        Log.d("RPFT-RPFT-RPFT-RPFT-RPFT-1", updatedCartJson.toString())
 
         try {
             editor.putString("cart_items", updatedCartJson).commit()
             val savedCartJson = sharedPreferences.getString("cart_items", "[]")
-            Log.d("RPFT-RPFT-RPFT-RPFT-RPFT-2", "Saved Cart JSON: $savedCartJson")
+//            Log.d("RPFT-RPFT-RPFT-RPFT-RPFT-2", "Saved Cart JSON: $savedCartJson")
         } catch (e: Exception) {
-            Log.e("RPFT-RPFT-RPFT-RPFT-RPFT-2", "Error saving cart items", e)
+//            Log.e("RPFT-RPFT-RPFT-RPFT-RPFT-2", "Error saving cart items", e)
         }
-
-
     }
 }
 

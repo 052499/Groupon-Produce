@@ -51,7 +51,7 @@ class RegisterFragment : Fragment() {
 
 
         binding.actvUserType.setOnClickListener {
-            Log.d("AutoComplete", "Clicked on AutoCompleteTextView")
+//            Log.d("AutoComplete", "Clicked on AutoCompleteTextView")
             // Optionally force the dropdown to show by calling showDropDown() programmatically
             binding.actvUserType.showDropDown()
         }
@@ -67,7 +67,7 @@ class RegisterFragment : Fragment() {
             address = binding.etUserAddress.text.toString()
 
             if (email.isNotEmpty() and !password.isEmpty() and name.isNotEmpty()) {
-                if (uType != "SELECT_USER_TYPE"){
+                if (uType == "ADMIN" || uType == "USER"){
                     firebaseAuth.createUserWithEmailAndPassword(email!!, password)
                         .addOnCompleteListener {
                             if (it.isSuccessful) {

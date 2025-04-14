@@ -1,126 +1,99 @@
 package com.example.grouponproduceapp.adminFragments
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.example.grouponproduceapp.Constants
-import com.example.grouponproduceapp.adapters.AdapterCategoryAdmin
-import com.example.grouponproduceapp.adapters.AdapterProductAdmin
-import com.example.grouponproduceapp.models.Category
-import com.example.grouponproduceapp.models.Product
-import com.example.grouponproduceapp.viewmodels.AdminVM
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.grouponproduceapp.R
-import com.example.grouponproduceapp.Utils
-import com.example.grouponproduceapp.activity.AuthMainActivity
-import com.example.grouponproduceapp.databinding.FragmentHomeAdminBinding
+import com.example.grouponproduceapp.databinding.FragmentProfileAdminBinding
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.DocumentSnapshot
 
-class HomeAdminFragment : Fragment() {
+class ProfileAdminFragment : Fragment() {
 
-    lateinit var binding: FragmentHomeAdminBinding
-    lateinit var adapterProduct: AdapterProductAdmin
-    val adminVM: AdminVM by viewModels()
-
-    override fun onResume() {
-        super.onResume()
-        getAllProducts("All")
-    }
+    private lateinit var binding: FragmentProfileAdminBinding
+    private val db = FirebaseFirestore.getInstance()
+    private val firebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentHomeAdminBinding.inflate(layoutInflater)
-        adapterProduct = AdapterProductAdmin(adminVM)
-//        statusBarColor()
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentProfileAdminBinding.inflate(inflater, container, false)
 
-        val logoutButton = binding.btnLogout
-        logoutButton.setOnClickListener {
-            logout()
+        fetchUserData()
+
+        binding.btnSave.setOnClickListener {
+            saveUpdatedProfileData()
         }
-
-        setCategories()
-        searchProducts()
-        getAllProducts("All")
 
         return binding.root
     }
 
-    private fun searchProducts(){
-        binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+    private fun fetchUserData() {
+        val currentUser = firebaseAuth.currentUser
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val query = p0.toString().trim()
-                adapterProduct.filter?.filter(query)
-            }
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userDocRef = db.collection("users").document(userId)
 
-            override fun afterTextChanged(p0: Editable?) { }
-        })
-    }
-
-    private fun getAllProducts(categoryTitle: String?) {
-        lifecycleScope.launch {
-            adminVM.fetchProducts(FirebaseAuth.getInstance().currentUser?.uid, categoryTitle).collect(){
-//                Log.d("HAF-HAF-HAF-HAF", "$categoryTitle        ${it}")
-                if (it.isEmpty()){
-                    binding.rvProducts.visibility = View.GONE
-                    binding.tvNoProduct.visibility = View.VISIBLE
+            userDocRef.get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val documentSnapshot: DocumentSnapshot = task.result!!
+                    if (documentSnapshot.exists()) {
+                        // Populate the fields with the fetched data
+                        binding.etName.setText(documentSnapshot.getString("name"))
+                        binding.etAddress.setText(documentSnapshot.getString("address"))
+                        binding.tvEmail.setText(documentSnapshot.getString("email"))
+                    } else {
+                        Toast.makeText(context, "No user data found", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Failed to fetch user data: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
-                else {
-                    binding.rvProducts.visibility = View.VISIBLE
-                    binding.tvNoProduct.visibility = View.GONE
-                }
-                binding.rvProducts.adapter = adapterProduct
-                adapterProduct.differList.submitList(it)
-                adapterProduct.originalList = it as ArrayList<Product>
             }
+        } else {
+            Toast.makeText(context, "No authenticated user found", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun logout() {
-        val auth= FirebaseAuth.getInstance()
-        val userToLogout = auth.currentUser?.email
-        auth.signOut()
-        val intent = Intent(requireActivity(), AuthMainActivity::class.java)
-        Utils.showToast(requireContext(), "${userToLogout} is logged out")
-        startActivity(intent)
-    }
+    // Function to save updated user data to Firestore
+    private fun saveUpdatedProfileData() {
+        val updatedName = binding.etName.text.toString()
+        val updatedAddress = binding.etAddress.text.toString()
 
-
-    private fun setCategories() {
-        val categoryList = ArrayList<Category>()
-
-        for (i in 0 until Constants.allCategoriesIcons.size){
-            categoryList.add(Category(Constants.allCategories[i], Constants.allCategoriesIcons[i]))
+        // Validate that the fields are not empty
+        if (updatedName.isEmpty() || updatedAddress.isEmpty()) {
+            Toast.makeText(context, "All fields must be filled", Toast.LENGTH_SHORT).show()
+            return
         }
-        binding.rvCategories.adapter = AdapterCategoryAdmin(categoryList, ::onCategoryClicked)
-    }
 
-    private fun onCategoryClicked(category: Category){
-        getAllProducts(category.title)
-    }
+        // Get the current user and their UID
+        val currentUser = firebaseAuth.currentUser
 
-    private fun statusBarColor() {
-        activity?.window?.apply {
-            val statusBarColors = ContextCompat.getColor(requireContext(),
-                R.color.blue
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userDocRef = db.collection("users").document(userId)
+
+            // Create a map of the updated data
+            val updatedData = hashMapOf(
+                "name" to updatedName,
+                "address" to updatedAddress,
             )
-            statusBarColor = statusBarColors
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
+
+            // Update the user's data in Firestore
+            userDocRef.update(updatedData.toMap())
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.homeFragment)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(context, "No authenticated user found", Toast.LENGTH_SHORT).show()
         }
     }
 }

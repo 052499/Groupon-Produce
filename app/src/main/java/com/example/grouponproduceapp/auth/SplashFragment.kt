@@ -54,7 +54,7 @@ class SplashFragment : Fragment() {
                                 if (document != null) {
                                     userName = document.getString("name")
                                     role = document.getString("role")
-                                    if (role == "admin") {
+                                    if (role?.uppercase() == "ADMIN") {
                                         val intent = Intent(requireActivity(), AdminMainActivity::class.java)
                                         startActivity(intent)
                                     } else {

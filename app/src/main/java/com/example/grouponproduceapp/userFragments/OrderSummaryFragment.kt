@@ -1,14 +1,12 @@
-
-
-
 package com.example.grouponproduceapp.userFragments
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -29,12 +27,15 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-
-class  OrderSummaryFragment : Fragment() {
+class OrderSummaryFragment : Fragment() {
     private lateinit var binding: FragmentOrderSummaryBinding
     private lateinit var adapterOrderedItems: AdapterOrderSummary
     private lateinit var firestore: FirebaseFirestore
     private val viewModel: UserVM by viewModels()
+
+    // Handler and Runnable for periodic refresh
+    private val handler = Handler()
+    private lateinit var refreshRunnable: Runnable
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,19 +46,29 @@ class  OrderSummaryFragment : Fragment() {
 
         firestore = FirebaseFirestore.getInstance()
         (activity as? UsersMainActivity)?.hideCheckoutButton()
-        setupOrderSummary()
+
+        // Start periodic refresh every 1 second
+        refreshRunnable = object : Runnable {
+            override fun run() {
+                setupOrderSummary()
+                handler.postDelayed(this, 10000) // 1-second interval
+            }
+        }
+        handler.post(refreshRunnable)
+
         binding.btnContinueShopping.setOnClickListener {
             activity?.supportFragmentManager?.popBackStack()
         }
+
         return binding.root
     }
 
     private fun openFullScreenFragment() {
         val fullScreenFragment = UserChatFragment()
         requireActivity().supportFragmentManager.beginTransaction()
-            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out) // Optional animation
-            .replace(android.R.id.content, fullScreenFragment) // Ensures full-screen display
-            .addToBackStack(null) // Enables back navigation
+            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+            .replace(android.R.id.content, fullScreenFragment)
+            .addToBackStack(null)
             .commit()
     }
 
@@ -67,33 +78,30 @@ class  OrderSummaryFragment : Fragment() {
             val orderDetails = mutableListOf<OrderDetailz>()
             binding.rvOrderedItems.layoutManager = LinearLayoutManager(requireContext())
 
-            adapterOrderedItems = AdapterOrderSummary(orderDetails){ adminId, orderId ->
-
+            adapterOrderedItems = AdapterOrderSummary(orderDetails) { adminId, orderId ->
                 val bundle = Bundle()
                 bundle.putString("orderId", orderId)
                 bundle.putString("userId", adminId)
-
                 findNavController().navigate(R.id.action_global_user_userChatFragment, bundle)
             }
             binding.rvOrderedItems.adapter = adapterOrderedItems
 
             lifecycleScope.launch {
                 val orderedItems = fetchOrderedItemsFromFirestore(userId)
-                if (orderedItems.isEmpty()){
+                if (orderedItems.isEmpty()) {
                     binding.rvOrderedItems.visibility = View.GONE
                     binding.tvNoOrders.visibility = View.VISIBLE
-                }
-                else {
+                } else {
                     binding.rvOrderedItems.visibility = View.VISIBLE
                     binding.tvNoOrders.visibility = View.GONE
                 }
+
                 val deferreds = orderedItems.map { orderedItem ->
                     async {
                         try {
                             val orderedWithItemsDetails = OrderDetailz(
                                 orderId = orderedItem.orderId,
                                 userId = userId,
-//                                adminId = orderedItem.adminId,
                                 orderPrice = orderedItem.orderPrice,
                                 orderDate = orderedItem.orderDate,
                                 orderStatus = orderedItem.orderStatus,
@@ -105,7 +113,7 @@ class  OrderSummaryFragment : Fragment() {
                                         productQty = detail.productQty,
                                         productTotalPrice = detail.productTotalPrice,
                                         productImgUri = detail.productImgUri,
-                                        adminId= detail.adminId
+                                        adminId = detail.adminId
                                     )
                                 }
                             )
@@ -131,7 +139,6 @@ class  OrderSummaryFragment : Fragment() {
     private suspend fun fetchOrderedItemsFromFirestore(userId: String): List<OrderDetailz> {
         return try {
             val ordersRef = firestore.collection("orders")
-            // Query to fetch orders where the userId matches the current user's userId
             val snapshot = ordersRef
                 .whereEqualTo("userId", userId)
                 .get()
@@ -149,11 +156,17 @@ class  OrderSummaryFragment : Fragment() {
         activity?.window?.apply {
             val statusBarColors = ContextCompat.getColor(
                 requireContext(),
-                R.color.defaultBackground )
+                R.color.defaultBackground
+            )
             statusBarColor = statusBarColors
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacks(refreshRunnable)
     }
 }
