@@ -1,6 +1,5 @@
 package com.example.grouponproduceapp.adapters
 
-
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible

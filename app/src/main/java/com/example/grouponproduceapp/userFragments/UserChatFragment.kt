@@ -3,17 +3,17 @@ package com.example.grouponproduceapp.userFragments
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.grouponproduceapp.R
 import com.example.grouponproduceapp.adapters.AdapterChat
 import com.example.grouponproduceapp.databinding.FragmentUserChatBinding
+
+import androidx.fragment.app.Fragment
+import com.example.grouponproduceapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -24,8 +24,7 @@ class UserChatFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapterChat: AdapterChat
 
-    private val handler = Handler()
-    private lateinit var refreshRunnable: Runnable
+    //private var messageList = mutableListOf<String>() // Store the chat messages
 
     var userId = ""
     val userName = ""
@@ -40,51 +39,25 @@ class UserChatFragment : Fragment() {
         orderId = arguments?.getString("orderId").toString()
         userId = arguments?.getString("userId").toString()
 
-        binding.toolBarChatFragment.setOnClickListener {
+        binding.toolBarChatFragment.setOnClickListener{
             activity?.supportFragmentManager?.popBackStack()
         }
 
         statusBarColor()
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        recyclerView = binding.recyclerViewMessages
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        adapterChat = AdapterChat(allChat)
-        recyclerView.adapter = adapterChat
-
         getAllChat()
         markMessagesAsRead(orderId)
-
-        // 🟡 Auto-refresh every 1 second
-        refreshRunnable = object : Runnable {
-            override fun run() {
-                getAllChat()
-                handler.postDelayed(this, 1000)
-            }
-        }
-        handler.post(refreshRunnable)
-
-        binding.btnSend.setOnClickListener {
-            val message = binding.etMessage.text.toString().trim()
-            if (message.isNotEmpty()) {
-                sendMessage(message)
-            }
-        }
+        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
+        print("onResume")
         requireActivity().findViewById<View>(R.id.bottomMenu)?.visibility = View.GONE
     }
 
     private fun markMessagesAsRead(orderId: String) {
         val db = FirebaseFirestore.getInstance()
-        val id = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val id = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         val chatRef = db.collection("chats")
             .whereEqualTo("order_id", orderId)
             .whereEqualTo("receiver_id", id)
@@ -99,6 +72,7 @@ class UserChatFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllChat() {
+        requireActivity().findViewById<View>(R.id.bottomMenu)?.visibility = View.GONE
         val db = FirebaseFirestore.getInstance()
         val id = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
@@ -108,17 +82,20 @@ class UserChatFragment : Fragment() {
             .whereEqualTo("order_id", orderId)
 
         query.addSnapshotListener { querySnapshot, error ->
-            if (error != null || querySnapshot == null) return@addSnapshotListener
+            if (error != null) {
+                return@addSnapshotListener
+            }
 
-            val updatedList = mutableListOf<ChatModel>()
+            allChat.clear()
 
-            for (document in querySnapshot.documents) {
-                val data = document.data ?: continue
+            querySnapshot?.documents?.forEach { document ->
+
+                val data = document.data ?: return@forEach
                 val timestamp = data["timestamp"]
                 val dateInMillis = when (timestamp) {
-                    is com.google.firebase.Timestamp -> timestamp.seconds * 1000
-                    is Long -> timestamp
-                    else -> 0L
+                    is com.google.firebase.Timestamp -> timestamp.seconds * 1000 // Convert to milliseconds
+                    is Long -> timestamp // If already stored as Long
+                    else -> 0L // Default value
                 }
 
                 val chat = ChatModel(
@@ -130,15 +107,19 @@ class UserChatFragment : Fragment() {
                     readStatus = data["readStatus"] as? Map<String, Boolean>
                 )
 
+                // If the current user is the receiver and the message is unread, update the read status
                 if (chat.receiverId == id && chat.readStatus?.get(id) == false) {
-                    db.collection("chats").document(chat.id!!).update("readStatus.$id", true)
+                    val chatRef = db.collection("chats").document(chat.id!!)
+                    chatRef.update("readStatus.$id", true)  // Mark the current user as having read the message
                 }
 
-                updatedList.add(chat)
+                allChat.add(chat)
             }
 
-            allChat.clear()
-            allChat.addAll(updatedList.sortedBy { it.date })
+             allChat = allChat.sortedBy { it.date }.toMutableList()
+
+            adapterChat = AdapterChat(allChat)
+            recyclerView.adapter = adapterChat
 
             adapterChat.notifyDataSetChanged()
             recyclerView.post {
@@ -147,43 +128,70 @@ class UserChatFragment : Fragment() {
         }
     }
 
-    private fun sendMessage(message: String) {
-        val myTimeStamp = System.currentTimeMillis()
-        val user = FirebaseAuth.getInstance().currentUser ?: return
-        val id = user.uid
-        val name = user.displayName ?: ""
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Set up RecyclerView
+        recyclerView = binding.recyclerViewMessages
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val params = hashMapOf(
-            "message" to message,
-            "sender_id" to id,
-            "sender_name" to name,
-            "receiver_id" to userId,
-            "receiver_name" to userName,
-            "order_id" to orderId,
-            "timestamp" to myTimeStamp,
-            "isRead" to false,
-            "readStatus" to hashMapOf(
-                id to false,
-                userId to false
-            )
-        )
+//        recyclerView.setHasFixedSize(true)
+        //messageList = getSampleMessages()
 
-        FirebaseFirestore.getInstance().collection("chats")
-            .add(params)
-            .addOnSuccessListener {
-                binding.etMessage.setText("")
+
+        binding.btnSend.setOnClickListener {
+            val message = binding.etMessage.text.toString().trim()
+
+            if (message.isNotEmpty()) {
+
+                val myTimeStamp = System.currentTimeMillis() // Convert to seconds
+
+                val user = FirebaseAuth.getInstance().currentUser
+                val id = user?.uid ?: ""
+                val name = user?.displayName ?: ""
+
+                val params = hashMapOf(
+                    "message" to message,
+                    "sender_id" to id,
+                    "sender_name" to name,
+                    "receiver_id" to userId,
+                    "receiver_name" to userName,
+                    "order_id" to orderId,
+                    "timestamp" to myTimeStamp,
+                    "isRead" to false,
+                    "readStatus" to hashMapOf(
+                        id to false,  // Sender's read status (false because they just sent it)
+                        userId to false // Receiver's read status (false because it's unread initially)
+                    )
+                )
+
+                val db = FirebaseFirestore.getInstance()
+                val path = "chats"
+
+                db.collection(path).add(params)
+                    .addOnSuccessListener {
+                        getAllChat()
+                        binding.etMessage.setText("")
+                    }
+                    .addOnFailureListener {
+                    }
             }
+        }
+    }
+
+    private fun getSampleMessages(): MutableList<String> {
+        return listOf("").toMutableList()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        handler.removeCallbacks(refreshRunnable) // 🧹 Stop auto-refresh
         _binding = null
     }
 
     private fun statusBarColor() {
         activity?.window?.apply {
-            val statusBarColors = ContextCompat.getColor(requireContext(), R.color.blue)
+            val statusBarColors = ContextCompat.getColor(
+                requireContext(),
+                R.color.blue )
             statusBarColor = statusBarColors
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
@@ -191,3 +199,14 @@ class UserChatFragment : Fragment() {
         }
     }
 }
+
+data class ChatModel(
+    var id: String? = null,
+    var message: String? = null,
+    var date: Long,
+    var senderId: String? = null,
+    var senderName: String? = null,
+    var receiverId: String? = null,
+    var receiverName: String? = null,
+    var readStatus: Map<String, Boolean>? = null
+)
