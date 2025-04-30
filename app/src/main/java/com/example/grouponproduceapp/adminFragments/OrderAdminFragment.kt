@@ -32,14 +32,14 @@ class OrderAdminFragment : Fragment() {
 
         val binding = FragmentOrderAdminBinding.inflate(inflater, container, false)
 
-        adapter = AdapterOrderAdminSummary(mutableListOf()) {  userId, orderId ->
+        adapter = AdapterOrderAdminSummary(mutableListOf()) { userId, orderId ->
 
-        val bundle = Bundle()
-        bundle.putString("orderId", orderId)
-        bundle.putString("userId", userId)
+            val bundle = Bundle()
+            bundle.putString("orderId", orderId)
+            bundle.putString("userId", userId)
 
             findNavController().navigate(R.id.action_global_admin_userChatFragment, bundle)
-    }
+        }
 
         binding.rvAdminOrders.layoutManager = LinearLayoutManager(requireContext())
         binding.rvAdminOrders.adapter = adapter
@@ -50,20 +50,23 @@ class OrderAdminFragment : Fragment() {
                 Log.d("OAF-onCreateView1", adminId.toString())
                 adminVM.fetchOrdersForAdmin(it).collect { orders ->
                     Log.d("OAF-onCreateView2", "Orders are:  $orders")
-                    if (orders.isEmpty()){
+                    if (orders.isEmpty()) {
                         Log.d("OAF-onCreateView3", "found no orders.")
                         binding.rvAdminOrders.visibility = View.GONE
                         binding.tvNoOrders.visibility = View.VISIBLE
-                    }
-                    else {
+                    } else {
                         Log.d("OAF-onCreateView3", "found orders.")
                         binding.rvAdminOrders.visibility = View.VISIBLE
                         binding.tvNoOrders.visibility = View.GONE
                     }
 
-                    val filteredOrders = orders.filter { (_, order) ->
-                        order.orderDetails?.any { it.adminId == adminId } == true
-                    }
+                    val filteredOrders = orders
+                        .filter { (_, order) ->
+                            order.orderDetails?.any { it.adminId == adminId } == true
+                        }
+                        .sortedByDescending { (_, order) ->
+                            order.orderDate ?: 0L  // use 0 if orderDate is null
+                        }
 //                    Log.d("OAF-2onCreateView", orders.toString())
                     adapter.setOrders(filteredOrders)
                 }

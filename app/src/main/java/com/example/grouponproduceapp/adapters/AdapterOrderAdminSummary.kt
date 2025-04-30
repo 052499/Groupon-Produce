@@ -155,7 +155,7 @@ class AdapterOrderAdminSummary(private var orders: List<Pair<String, OrderDetail
             val order = documentSnapshot.toObject(OrderDetailz::class.java)
 
             if (order != null && order.orderStatus != newStatus) {
-                if (newStatus == "Packed") {
+                if (newStatus == "Cancelled") {
                     // If status is changing to "Packed", update stock
                     order.orderDetails?.forEach { orderDetail ->
                         val productRef =
@@ -167,7 +167,7 @@ class AdapterOrderAdminSummary(private var orders: List<Pair<String, OrderDetail
 
                             if (product != null) {
 //                                Log.d("UOS-UOS=UOS-UOS-4a", "${orderDetail.productQty}   ${product.productStock}")
-                                val newStock = (product.productStock ?: 0) - orderDetail.productQty
+                                val newStock = (product.productStock ?: 0) + orderDetail.productQty
 //                                Log.d("UOS-UOS-UOS-UOS-4", newStock.toString())
                                 productRef.child("productStock").setValue(newStock)
                                     .addOnSuccessListener {

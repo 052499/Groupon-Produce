@@ -24,6 +24,7 @@ import com.example.grouponproduceapp.models.OrderedItemDetails
 import com.example.grouponproduceapp.viewmodels.UserVM
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -79,6 +80,7 @@ class  OrderSummaryFragment : Fragment() {
 
             lifecycleScope.launch {
                 val orderedItems = fetchOrderedItemsFromFirestore(userId)
+                    .sortedByDescending { it.orderDate }
                 if (orderedItems.isEmpty()){
                     binding.rvOrderedItems.visibility = View.GONE
                     binding.tvNoOrders.visibility = View.VISIBLE

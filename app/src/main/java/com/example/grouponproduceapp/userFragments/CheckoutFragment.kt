@@ -28,6 +28,7 @@ import com.example.grouponproduceapp.models.CartItemWithDetails
 import com.example.grouponproduceapp.models.OrderedItemDetails
 import com.example.grouponproduceapp.viewmodels.UserVM
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -162,32 +163,53 @@ class CheckoutFragment : Fragment() {
                     async {
                         try {
                             if (cartItem.quantity > 0) {
-                                // Fetch product details for each item in the cart
+//                                // Fetch product details for each item in the cart
                                 val product = viewModel.fetchProductById(cartItem.productId).first()
+                                val remainingStock = product.productStock?.minus(cartItem.quantity)
 
-                                // Create a new OrderedItemDetails object for each cart item
-                                val cartItemDetails = OrderedItemDetails(
-                                    adminId = product.adminUid,
-                                    productId = cartItem.productId,
-                                    productName = product.productTitle,
-                                    productQty = cartItem.quantity,
-                                    productTotalPrice = product.productPrice!!.toInt() * cartItem.quantity,
-                                    productImgUri = product.productImgsUri?.firstOrNull()
-                                )
+                                if (remainingStock!! > 0) {
+                                    // Create a new OrderedItemDetails object for each cart item
+                                    val cartItemDetails = OrderedItemDetails(
+                                        adminId = product.adminUid,
+                                        productId = cartItem.productId,
+                                        productName = product.productTitle,
+                                        productQty = cartItem.quantity,
+                                        productTotalPrice = product.productPrice!!.toInt() * cartItem.quantity,
+                                        productImgUri = product.productImgsUri?.firstOrNull()
+                                    )
 
-                                // Add the item to the orderDetails list
-                                orderDetails.add(cartItemDetails)
+                                    // Add the item to the orderDetails list
+                                    orderDetails.add(cartItemDetails)
 
-                                // Update the total price
-                                totalPrice += product.productPrice!! * cartItem.quantity
-                            } else {
-                                Log.d("Zero Quantity", "The item in the cart has 0 quantity.")
+                                    // Update the total price
+                                    totalPrice += product.productPrice!! * cartItem.quantity
+
+                                    // Update stock in Firebase Realtime DB
+                                    FirebaseDatabase.getInstance()
+                                        .getReference("Admins")
+                                        .child("products")
+                                        .child(cartItem.productId)
+                                        .child("productStock")
+                                        .setValue(remainingStock)
+                                        .addOnSuccessListener {
+                                            Log.d("CheckoutFragment", "Stock updated for ${cartItem.productId}")
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e("CheckoutFragment", "Failed to update stock: ${it.message}")
+                                        }
+                                } else {
+                                    Utils.showToast(requireContext(), "Product ${cartItem.productId} is out of stock.")
+                                }
+
+                            } else{
+                                Log.d("CheckoutFragment", "Product selected has 0 item in cart.")
                             }
-                        } catch (e: Exception) {
-                            Log.e("CheckoutFragment", "Error fetching product: ${e.message}")
+                        }
+                            catch (e: Exception) {
+                                Log.e("CheckoutFragment", "Error processing item: ${e.message}")
+                            }
                         }
                     }
-                }
 
                 // Wait for all async tasks to complete
                 deferreds.awaitAll()
